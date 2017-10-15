@@ -4,6 +4,6 @@
     <MASM Include="haslamth.asm" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="template.txt" />
+    <Text Include="template.ref" />
   </ItemGroup>
 </Project>

@@ -126,7 +126,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <MASM Include="haslamth.asm" />
-    <Text Include="template.txt">
+    <Text Include="template.ref">
       <FileType>Document</FileType>
       <TreatWarningsAsErrors Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</TreatWarningsAsErrors>
     </Text>

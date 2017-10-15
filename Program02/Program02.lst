@@ -1,9 +1,9 @@
-Microsoft (R) Macro Assembler Version 14.11.25508.2	    10/13/17 23:41:39
-!Math Assistant     (haslamth.asm			     Page 1 - 1
+Microsoft (R) Macro Assembler Version 14.11.25508.2	    10/14/17 19:35:45
+&FIBONACCI GENERATOR     (haslamth.asm			     Page 1 - 1
 
 
-				TITLE Math Assistant     (haslamth.asm)            
-				;EC: Program verifies second number less than first.
+				TITLE FIBONACCI GENERATOR     (haslamth.asm)            
+				;EC: Program displays aligned columns.
 
 				; Author: Tom Haslam
 				; CS271 / Project #1                 Date: 10/1/2017
@@ -29,71 +29,221 @@ Microsoft (R) Macro Assembler Version 14.11.25508.2	    10/13/17 23:41:39
 			      C 
 
 				; (insert constant definitions here)
-
+ = 0000002E			    max_terms           EQU         46                                              ;store maximum number of fib terms
+ = 00000001			    min_terms           EQU         1                                               ;store minimum number of fib terms
+ = 00000009			    ascii_tab           EQU         9                                               ;store ascii tab character
  00000000			.data
- 00000000 46 49 42 4F 4E	    intro               BYTE    "FIBONACCI GENERATOR", 10, \
+ 00000000 46 49 42 4F 4E	    intro               BYTE        "FIBONACCI GENERATOR", 10, \
 	   41 43 43 49 20
 	   47 45 4E 45 52
 	   41 54 4F 52 0A
 	   54 6F 6D 20 48
 	   61 73 6C 61 6D
-	   0A 00
-				                                "Tom Haslam", 10, 0                ;store author and title
- 00000020 47 6F 6F 64 20	    terminate_1         BYTE    "Good Bye!, press any key to exit.", 0          ;store exit message
+	   0A 2A 2A 45 43
+	   3A 20 50 72 6F
+	   67 72 61 6D 20
+	   64 69 73 70 6C
+	   61 79 73 20 6F
+	   75 74 70 75 74
+	   20 69 6E 20 61
+	   6C 69 67 6E 65
+	   64 20 63 6F 6C
+	   75 6D 6E 73 0A
+	   00
+				                                    "Tom Haslam", 10, \
+				                                    "**EC: Program displays output in aligned columns", \
+				                                    10, 0                                           ; store intro text
+				                                    ;store author and title
+ 00000051 47 6F 6F 64 20	    terminate_1         BYTE        "Good Bye!, press any key to exit.", 0          ;store exit message
 	   42 79 65 21 2C
 	   20 70 72 65 73
 	   73 20 61 6E 79
 	   20 6B 65 79 20
 	   74 6F 20 65 78
 	   69 74 2E 00
- 00000042 45 6E 74 65 72	    username_instructs  BYTE    "Enter your username: ", 0                      ;instructions to enter username
+ 00000073 45 6E 74 65 72	    username_instructs  BYTE        "Enter your username: ", 0                      ;instructions to enter username
 	   20 79 6F 75 72
 	   20 75 73 65 72
 	   6E 61 6D 65 3A
 	   20 00
- 00000058  00000040 [		    username            BYTE 64 DUP(0)                                          ;username input buffer
+ 00000089  00000040 [		    username            BYTE 64     DUP(0)                                          ;username input buffer
 	    00
 	   ]
- 00000098 48 65 6C 6C 6F	    greeting_prefix     BYTE    "Hello ", 0                                     ;greeting prefix
+ 000000C9 48 65 6C 6C 6F	    greeting_prefix     BYTE        "Hello, ", 0                                    ;greeting prefix
+	   2C 20 00
+ 000000D1 21 00			    greeting_suffix     BYTE        "!" ,0                                          ;greeting suffix
+ 000000D3 45 6E 74 65 72	    instructions        BYTE        "Enter the number of Fibonacci terms to be ", \
+	   20 74 68 65 20
+	   6E 75 6D 62 65
+	   72 20 6F 66 20
+	   46 69 62 6F 6E
+	   61 63 63 69 20
+	   74 65 72 6D 73
+	   20 74 6F 20 62
+	   65 20 64 69 73
+	   70 6C 61 79 65
+	   64 2E 20 0A 47
+	   69 76 65 20 74
+	   68 65 20 6E 75
+	   6D 62 65 72 20
+	   61 73 20 61 6E
+	   20 69 6E 74 65
+	   67 65 72 20 69
+	   6E 20 74 68 65
+	   20 72 61 6E 67
+	   65 20 5B 31 2E
+	   2E 34 36 5D 2E
 	   20 00
- 0000009F 21 00			    greeting_suffix     BYTE    "!" ,0                                          ;greeting suffix
+				                                    "displayed. ", 10, "Give the number as an ", \
+				                                    "integer in the range [1..46]. ", 0             ;store instructions for input number
+				    
+ 0000013E 00000000		    term_count          DWORD       ?                                               ;store number of fibonacci terms
+ 00000142 00000000		    term_counter        DWORD       0                                               ;store count of terms generated
+ 00000146 00000005		    terms_per_line      DWORD       5                                               ;store number of terms to display per line
+ 0000014A 21 54 65 72 6D	    invalid_term_low    BYTE        "!Term count below acceptable range.", 0        ;store invalid terms count message
+	   20 63 6F 75 6E
+	   74 20 62 65 6C
+	   6F 77 20 61 63
+	   63 65 70 74 61
+	   62 6C 65 20 72
+	   61 6E 67 65 2E
+	   00
+ 0000016E 21 54 65 72 6D	    invalid_term_high   BYTE        "!Term count above acceptable range.", 0        ;store invalid terms count message
+	   20 63 6F 75 6E
+	   74 20 61 62 6F
+	   76 65 20 61 63
+	   63 65 70 74 61
+	   62 6C 65 20 72
+	   61 6E 67 65 2E
+	   00
+
+ 00000192 00000001		    last_fib            DWORD       1                                               ;store prior fib number in sequence
+ 00000196 00000000		    curr_fib            DWORD       0                                               ;store current fib number in sequence
+
+ 0000019A  0000000C [		    column_padding      BYTE 12     DUP(" "), 0                                     ;store max padding between output columns
+	    20
+	   ] 00
+ 000001A7 0000019A R		    ptr_padding         DWORD       column_padding                                  ;pointer to column padding array
+ 000001AB 000001A3 R		    ptr_padding_max     DWORD       column_padding + 9                              ;store max padding offset
+ 000001AF 0000000A		    column_decimal      DWORD       10                                              ;store decimal place
+ 000001B3 000A			    column_decimal_mul  WORD        10
+ 000001B5 00000001		    column_position     DWORD       1                                               ;store col position current fib
  00000000			.code
  00000000			main PROC
 
 				; display title and programmers name
- 00000000  BA 00000000 R	mov     edx, OFFSET intro
- 00000005  E8 00000000 E	call    WriteString
- 0000000A  E8 00000000 E	call    CrLf
+ 00000000  BA 00000000 R	    mov     edx, OFFSET intro
+ 00000005  E8 00000000 E	    call    WriteString
+ 0000000A  E8 00000000 E	    call    CrLf
 
-				; get users name
- 0000000F  BA 00000042 R	mov     edx, OFFSET username_instructs
- 00000014  E8 00000000 E	call    WriteString
- 00000019  BA 00000058 R	mov     edx, OFFSET username
- 0000001E  B9 00000040		mov     ecx, SIZEOF username
- 00000023  E8 00000000 E	call    ReadString
- 00000028  E8 00000000 E	call    CrLf
- 0000002D  BA 00000098 R	mov     edx, OFFSET greeting_prefix
- 00000032  E8 00000000 E	call    WriteString
- 00000037  BA 00000058 R	mov     edx, OFFSET username
- 0000003C  E8 00000000 E	call    WriteString
- 00000041  BA 0000009F R	mov     edx, OFFSET greeting_suffix
- 00000046  E8 00000000 E	call    WriteString
+				; get user name and display instructions
+ 0000000F  BA 00000073 R	    mov     edx, OFFSET username_instructs
+ 00000014  E8 00000000 E	    call    WriteString
+ 00000019  BA 00000089 R	    mov     edx, OFFSET username
+ 0000001E  B9 00000040		    mov     ecx, SIZEOF username
+ 00000023  E8 00000000 E	    call    ReadString
+ 00000028  E8 00000000 E	    call    CrLf
+ 0000002D  BA 000000C9 R	    mov     edx, OFFSET greeting_prefix
+ 00000032  E8 00000000 E	    call    WriteString
+ 00000037  BA 00000089 R	    mov     edx, OFFSET username
+ 0000003C  E8 00000000 E	    call    WriteString
+ 00000041  BA 000000D1 R	    mov     edx, OFFSET greeting_suffix
+ 00000046  E8 00000000 E	    call    WriteString
+
+				; get integer of fibonacci integers
+ 0000004B			ReadTermCount:
+ 0000004B  E8 00000000 E	    call    CrLf
+ 00000050  E8 00000000 E	    call    CrLf
+ 00000055  BA 000000D3 R	    mov     edx, OFFSET instructions
+ 0000005A  E8 00000000 E	    call    WriteString
+ 0000005F  E8 00000000 E	    call	ReadInt
+ 00000064  83 F8 2E		    cmp     eax, max_terms
+ 00000067  7F 18		    jg      DisplayInvalidAboveMax
+ 00000069  83 F8 01		    cmp     eax, min_terms
+ 0000006C  7C 07		    jl      DisplayInvalidBelowMin
+ 0000006E  A3 0000013E R	    mov		term_count, eax
+ 00000073  EB 18		    jmp     Calculate
+
+				; display invalid input error messages
+ 00000075			DisplayInvalidBelowMin:
+ 00000075  BA 0000014A R	    mov     edx, OFFSET invalid_term_low
+ 0000007A  E8 00000000 E	    call    WriteString
+ 0000007F  EB CA		    jmp     ReadTermCount
+
+ 00000081			DisplayInvalidAboveMax:
+ 00000081  BA 0000016E R	    mov     edx, OFFSET invalid_term_high
+ 00000086  E8 00000000 E	    call    WriteString
+ 0000008B  EB BE		    jmp     ReadTermCount
+
+ 0000008D			Calculate:
+ 0000008D  E8 00000000 E	    call    CrLf
+ 00000092  8B 0D 0000013E R	    mov     ecx, term_count         ;initialize ecx loop counter with number of terms entered by user
+				    
+ 00000098			NextTerm:
+				; use a loop counter so we can put a line break in every five terms
+ 00000098  FF 05 00000142 R	    inc     term_counter
+				        
+				; calculate newterm
+ 0000009E  A1 00000192 R	    mov     eax, last_fib
+ 000000A3  03 05 00000196 R	    add     eax, curr_fib
+ 000000A9  8B 1D 00000196 R	    mov     ebx, curr_fib
+ 000000AF  89 1D 00000192 R	    mov     last_fib, ebx
+ 000000B5  A3 00000196 R	    mov     curr_fib, eax
+ 000000BA  E8 00000000 E	    call    WriteDec
+
+				; put this into a proc because loop jmp was too big and better organized
+ 000000BF  E8 0000003C		    call    WritePadding
+
+				; check modulo to determine if we need to start a new line
+ 000000C4  BA 00000000		    mov     edx, 0
+ 000000C9  A1 00000142 R	    mov     eax, term_counter
+ 000000CE  F7 35 00000146 R	    div     terms_per_line
+ 000000D4  83 FA 00		    cmp     edx, 0
+ 000000D7  75 05		    jne     Continue
+ 000000D9  E8 00000000 E	    call    CrLf
+ 000000DE			Continue:
+ 000000DE  E2 B8		    loop    NextTerm
 
 				; exit program but wait for user to press any key
- 0000004B			ExitProgram:
- 0000004B  E8 00000000 E	    call    CrLf
- 00000050  BA 00000020 R	    mov     edx, OFFSET terminate_1
- 00000055  E8 00000000 E	    call    WriteString
- 0000005A  E8 00000000 E	    call	ReadChar
+ 000000E0			ExitProgram:
+ 000000E0  E8 00000000 E	    call    CrLf
+ 000000E5  E8 00000000 E	    call    CrLf
+ 000000EA  BA 00000051 R	    mov     edx, OFFSET terminate_1
+ 000000EF  E8 00000000 E	    call    WriteString
+ 000000F4  E8 00000000 E	    call	ReadChar
 					exit	; exit to operating system
- 0000005F  6A 00	   *	    push   +000000000h
- 00000061  E8 00000000 E   *	    call   ExitProcess
+ 000000F9  6A 00	   *	    push   +000000000h
+ 000000FB  E8 00000000 E   *	    call   ExitProcess
 
- 00000066			main ENDP
+ 00000100			main ENDP
+
+				; Procedure to write evenly spaced padding between columns
+				; I don't like that this procedure relies on so many globals
+ 00000100			WritePadding PROC
+				; NOTE: if column_decimal exceeded a 32bit integer this logic would break
+ 00000100  BA 00000000		    mov     edx, 0
+ 00000105  A1 00000196 R	    mov     eax, curr_fib
+ 0000010A  F7 35 000001AF R	    div     column_decimal
+ 00000110  83 F8 01		    cmp     eax, 1
+ 00000113  75 17		    jne     PrintPadding
+
+				; update decimal positions
+ 00000115  A1 000001AF R	     mov     eax, column_decimal
+ 0000011A  BB 0000000A		     mov     ebx, 10
+ 0000011F  F7 E3		     mul     ebx
+ 00000121  A3 000001AF R	     mov     column_decimal, eax
+ 00000126  FF 05 000001A7 R	     inc     ptr_padding
+
+				; write out padding between terms
+ 0000012C			PrintPadding:
+ 0000012C  8B 15 000001A7 R	     mov     edx, ptr_padding
+ 00000132  E8 00000000 E	     call    WriteString
+ 00000137  C3			     ret
+ 00000138			WritePadding ENDP
 
 				END main
-Microsoft (R) Macro Assembler Version 14.11.25508.2	    10/13/17 23:41:39
-!Math Assistant     (haslamth.asm			     Symbols 2 - 1
+Microsoft (R) Macro Assembler Version 14.11.25508.2	    10/14/17 19:35:45
+&FIBONACCI GENERATOR     (haslamth.asm			     Symbols 2 - 1
 
 
 
@@ -186,8 +336,8 @@ Segments and Groups:
 
 FLAT . . . . . . . . . . . . . .	GROUP
 STACK  . . . . . . . . . . . . .	32 Bit	 00001000 Para	  Stack	  'STACK'	 
-_DATA  . . . . . . . . . . . . .	32 Bit	 000000A1 Para	  Public  'DATA'	
-_TEXT  . . . . . . . . . . . . .	32 Bit	 00000066 Para	  Public  'CODE'	
+_DATA  . . . . . . . . . . . . .	32 Bit	 000001B9 Para	  Public  'DATA'	
+_TEXT  . . . . . . . . . . . . .	32 Bit	 00000138 Para	  Public  'CODE'	
 
 
 Procedures, parameters, and locals:
@@ -289,13 +439,21 @@ WriteFloat . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External
 WriteHexB  . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 WriteHex . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 WriteInt . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
+WritePadding . . . . . . . . . .	P Near	 00000100 _TEXT	Length= 00000038 Public STDCALL
+  PrintPadding . . . . . . . . .	L Near	 0000012C _TEXT	
 WriteStackFrameName  . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 WriteStackFrame  . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 WriteString  . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 WriteToFile  . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 WriteWindowsMsg  . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
-main . . . . . . . . . . . . . .	P Near	 00000000 _TEXT	Length= 00000066 Public STDCALL
-  ExitProgram  . . . . . . . . .	L Near	 0000004B _TEXT	
+main . . . . . . . . . . . . . .	P Near	 00000000 _TEXT	Length= 00000100 Public STDCALL
+  ReadTermCount  . . . . . . . .	L Near	 0000004B _TEXT	
+  DisplayInvalidBelowMin . . . .	L Near	 00000075 _TEXT	
+  DisplayInvalidAboveMax . . . .	L Near	 00000081 _TEXT	
+  Calculate  . . . . . . . . . .	L Near	 0000008D _TEXT	
+  NextTerm . . . . . . . . . . .	L Near	 00000098 _TEXT	
+  Continue . . . . . . . . . . .	L Near	 000000DE _TEXT	
+  ExitProgram  . . . . . . . . .	L Near	 000000E0 _TEXT	
 printf . . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External C
 scanf  . . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External C
 wsprintfA  . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External C
@@ -514,16 +672,26 @@ VK_UP  . . . . . . . . . . . . .	Number	 00000026h
 WINDOW_BUFFER_SIZE_EVENT . . . .	Number	 00000004h   
 WriteConsoleOutputCharacter  . .	Text   	 WriteConsoleOutputCharacterA
 WriteConsole . . . . . . . . . .	Text   	 WriteConsoleA
+ascii_tab  . . . . . . . . . . .	Number	 00000009h   
 black  . . . . . . . . . . . . .	Number	 00000000h   
 blue . . . . . . . . . . . . . .	Number	 00000001h   
 brown  . . . . . . . . . . . . .	Number	 00000006h   
+column_decimal_mul . . . . . . .	Word	 000001B3 _DATA	
+column_decimal . . . . . . . . .	DWord	 000001AF _DATA	
+column_padding . . . . . . . . .	Byte	 0000019A _DATA	
+column_position  . . . . . . . .	DWord	 000001B5 _DATA	
+curr_fib . . . . . . . . . . . .	DWord	 00000196 _DATA	
 cyan . . . . . . . . . . . . . .	Number	 00000003h   
 exit . . . . . . . . . . . . . .	Text   	 INVOKE ExitProcess,0
 gray . . . . . . . . . . . . . .	Number	 00000008h   
 green  . . . . . . . . . . . . .	Number	 00000002h   
-greeting_prefix  . . . . . . . .	Byte	 00000098 _DATA	
-greeting_suffix  . . . . . . . .	Byte	 0000009F _DATA	
+greeting_prefix  . . . . . . . .	Byte	 000000C9 _DATA	
+greeting_suffix  . . . . . . . .	Byte	 000000D1 _DATA	
+instructions . . . . . . . . . .	Byte	 000000D3 _DATA	
 intro  . . . . . . . . . . . . .	Byte	 00000000 _DATA	
+invalid_term_high  . . . . . . .	Byte	 0000016E _DATA	
+invalid_term_low . . . . . . . .	Byte	 0000014A _DATA	
+last_fib . . . . . . . . . . . .	DWord	 00000192 _DATA	
 lightBlue  . . . . . . . . . . .	Number	 00000009h   
 lightCyan  . . . . . . . . . . .	Number	 0000000Bh   
 lightGray  . . . . . . . . . . .	Number	 00000007h   
@@ -531,10 +699,17 @@ lightGreen . . . . . . . . . . .	Number	 0000000Ah
 lightMagenta . . . . . . . . . .	Number	 0000000Dh   
 lightRed . . . . . . . . . . . .	Number	 0000000Ch   
 magenta  . . . . . . . . . . . .	Number	 00000005h   
+max_terms  . . . . . . . . . . .	Number	 0000002Eh   
+min_terms  . . . . . . . . . . .	Number	 00000001h   
+ptr_padding_max  . . . . . . . .	DWord	 000001AB _DATA	
+ptr_padding  . . . . . . . . . .	DWord	 000001A7 _DATA	
 red  . . . . . . . . . . . . . .	Number	 00000004h   
-terminate_1  . . . . . . . . . .	Byte	 00000020 _DATA	
-username_instructs . . . . . . .	Byte	 00000042 _DATA	
-username . . . . . . . . . . . .	Byte	 00000058 _DATA	
+term_counter . . . . . . . . . .	DWord	 00000142 _DATA	
+term_count . . . . . . . . . . .	DWord	 0000013E _DATA	
+terminate_1  . . . . . . . . . .	Byte	 00000051 _DATA	
+terms_per_line . . . . . . . . .	DWord	 00000146 _DATA	
+username_instructs . . . . . . .	Byte	 00000073 _DATA	
+username . . . . . . . . . . . .	Byte	 00000089 _DATA	
 white  . . . . . . . . . . . . .	Number	 0000000Fh   
 wsprintf . . . . . . . . . . . .	Text   	 wsprintfA
 yellow . . . . . . . . . . . . .	Number	 0000000Eh   
